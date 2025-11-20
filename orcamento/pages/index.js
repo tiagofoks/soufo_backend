@@ -8,12 +8,19 @@ const BASE_PRICES_STORAGE_KEY = `${APP_ID}_base_prices`; // Chave para salvar os
 
 // --- Dados Iniciais ---
 const INITIAL_ITEMS = [
-    { id: 'boiler', description: 'RESERVATÓRIO (BOILER) - 600 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 3710.00, qty: 1, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
-    { id: 'placas', description: 'COLETORES SOLAR KISOLTEC - MODELO ULTRATEC 2,00x0.90', unitPrice: 1120.00, qty: 3, details: 'Máximo aproveitamento por m², Certificado pelo INMETRO e Selo PROCEL.' },
-    { id: 'pressurizador', description: 'PRESSURIZADOR MAX POWER (EM INOX)', unitPrice: 1425.00, qty: 2, details: 'Garante pressão ideal pós-boiler.' },
-    { id: 'kit_instalacao', description: 'KIT MATERIAL (EM COBRE) P/INSTALAÇÃO (ESTIMATIVA)', unitPrice: 1900.00, qty: 1, details: 'Tubulação e conexões para montagem do sistema.' },
-    { id: 'timer', description: 'TIMER DIGITAL TLZ', unitPrice: 580.00, qty: 1, details: 'Controle de apoio elétrico.' },
-    { id: 'mao_obra', description: 'MÃO DE OBRA DE INSTALAÇÃO (ESTIMATIVA)', unitPrice: 950.00, qty: 1, details: 'Instalação e testes do sistema completo.' },
+    { id: 'boiler2', description: 'RESERVATÓRIO (BOILER) - 200 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 2408.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler3', description: 'RESERVATÓRIO (BOILER) - 300 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 2898.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler4', description: 'RESERVATÓRIO (BOILER) - 400 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 3315.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler5', description: 'RESERVATÓRIO (BOILER) - 500 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 3864.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler6', description: 'RESERVATÓRIO (BOILER) - 600 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 4447.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler8', description: 'RESERVATÓRIO (BOILER) - 800 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 5315.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler10', description: 'RESERVATÓRIO (BOILER) - 1000 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 6157.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'placas', description: 'COLETORES SOLAR KISOLTEC - MODELO ULTRATEC 1.50x0.90', unitPrice: 1220.00, qty: 0, details: 'Máximo aproveitamento por m², Certificado pelo INMETRO e Selo PROCEL.' },
+    { id: 'placas2', description: 'COLETORES SOLAR KISOLTEC - MODELO ULTRATEC 2.00x0.90', unitPrice: 1536.00, qty: 0, details: 'Máximo aproveitamento por m², Certificado pelo INMETRO e Selo PROCEL.' },
+    { id: 'pressurizador', description: 'PRESSURIZADOR MAX POWER (EM INOX)', unitPrice: 1425.00, qty: 0, details: 'Garante pressão ideal pós-boiler.' },
+    { id: 'kit_instalacao', description: 'KIT MATERIAL (EM COBRE) P/INSTALAÇÃO (ESTIMATIVA)', unitPrice: 1900.00, qty: 0, details: 'Tubulação e conexões para montagem do sistema.' },
+    { id: 'timer', description: 'TIMER DIGITAL TLZ', unitPrice: 580.00, qty: 0, details: 'Controle de apoio elétrico.' },
+    { id: 'mao_obra', description: 'MÃO DE OBRA DE INSTALAÇÃO (ESTIMATIVA)', unitPrice: 950.00, qty: 0, details: 'Instalação e testes do sistema completo.' },
 ];
 
 // --- Funções Utilitárias ---
@@ -33,8 +40,8 @@ const useBudget = () => {
 
     // Estado do Cliente
     const [client, setClient] = useState({
-        nome: 'ANILTON FIGUEIREDO',
-        telefone: '(11) 98584-3736',
+        nome: 'NOME CLIENTE',
+        telefone: '(15) 99999-9999',
         email: 'cliente@exemplo.com',
         endereco: 'Rua Exemplo, 123',
         cidade: 'Sorocaba/SP',
@@ -363,8 +370,8 @@ const BudgetView = React.forwardRef(({ client, items, totalValue, userId }, ref)
         <div className="header-print text-center border-b-2 border-cyan-500 pb-4 mb-6">
             <h1 className="text-3xl font-bold text-cyan-600 uppercase tracking-widest">A CASA DOS AQUECEDORES</h1>
             <p className="text-sm text-gray-600 mt-1">SOLAR, ELÉTRICO, GÁS, FILTRO CENTRAL E BOMBAS DE CALOR P/ PISCINAS.</p>
-            <p className="text-xs text-gray-500 mt-2">FONE (15) 3227-3025 | MATARAZZO, N 610 - SANTA RITA - SOROCABA/SP</p>
-            <p className="text-xs text-gray-500">E-mail: casa_aquecedores@yahoo.com.hr</p>
+            <p className="text-xs text-gray-500 mt-2">FONE (15) 3227-3025 - SOROCABA/SP</p>
+            <p className="text-xs text-gray-500">E-mail: casa.aquecedores@yahoo.com.hr</p>
         </div>
 
         <div className="client-info-print grid grid-cols-2 gap-4 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -380,7 +387,7 @@ const BudgetView = React.forwardRef(({ client, items, totalValue, userId }, ref)
 
         <div className="text-center mb-6">
             <h2 className="text-xl font-semibold text-gray-800 border-b-2 border-green-500 pb-1 inline-block">ORÇAMENTO DE AQUECIMENTO SOLAR - {new Date().toLocaleDateString('pt-BR')}</h2>
-            <p className="text-sm text-gray-600 mt-1">600 LTS PRESSURIZAÇÃO PÓS BOILER</p>
+            <p className="text-sm text-gray-600 mt-1"></p>
         </div>
 
         <table className="items-table-print w-full border-collapse border border-gray-300">
@@ -440,8 +447,9 @@ const BudgetView = React.forwardRef(({ client, items, totalValue, userId }, ref)
         </div>
 
         <div className="footer-print text-center mt-12 pt-6 border-t border-gray-300 text-gray-600">
-            <p className="font-semibold text-sm">Assinatura do Responsável / Data: {new Date().toLocaleDateString('pt-BR')}</p>
-            <p className="text-xs mt-1">Criado pelo usuário ID: {userId}</p>
+            <p className="font-semibold text-sm">Roseli Sepulveda</p>
+            <p className="font-semibold text-sm">(15) 99705-0935</p>
+            <p className='text-xs mt-1'>Data: {new Date().toLocaleDateString('pt-BR')}</p>
         </div>
         <style>
             {`
