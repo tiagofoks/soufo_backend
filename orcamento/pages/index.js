@@ -40,11 +40,11 @@ const useBudget = () => {
 
     // Estado do Cliente
     const [client, setClient] = useState({
-        nome: 'NOME CLIENTE',
-        telefone: '(15) 99999-9999',
-        email: 'cliente@exemplo.com',
-        endereco: 'Rua Exemplo, 123',
-        cidade: 'Sorocaba/SP',
+        nome: '',
+        telefone: '',
+        email: '',
+        endereco: '',
+        cidade: '',
     });
 
     // Estado dos Itens
@@ -558,12 +558,9 @@ const App = () => {
                 <div className="bg-cyan-600 text-white p-6 rounded-xl shadow-2xl">
                     <h1 className="text-3xl font-extrabold flex items-center">
                         <Sun className="w-8 h-8 mr-3 text-yellow-300" />
-                        Gerador de Orçamentos de Energia Solar
+                        A Casa dos Aquecedores
                     </h1>
                     <p className="mt-1 text-cyan-100">Salvamento Local (LocalStorage).</p>
-                    <p className="mt-2 text-sm font-mono text-cyan-200">
-                        Usuário ID: {userId} (Local)
-                    </p>
                 </div>
 
                 {/* Colunas: Formulário de Edição vs. Preços Base */}
