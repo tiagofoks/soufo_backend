@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { User, DollarSign, Printer, Save, RefreshCw, ArrowRight, Home, Mail, Phone, MapPin, Package, Sun, Ruler, Clock, AlertTriangle } from 'lucide-react';
+import { User, DollarSign, Printer, Save, RefreshCw, ArrowRight, Home, Mail, Phone, MapPin, Package, Sun, Ruler, Clock, AlertTriangle, Send, Mail as WhatsappIcon } from 'lucide-react';
+// Importação da biblioteca de geração de PDF (Assegure-se de que está instalada!)
+// import html2pdf from 'html2pdf.js'; 
 
 // Variáveis Globais (Simplificadas)
 const APP_ID = 'local-budget-app'; // ID local fictício
@@ -8,13 +10,13 @@ const BASE_PRICES_STORAGE_KEY = `${APP_ID}_base_prices`; // Chave para salvar os
 
 // --- Dados Iniciais ---
 const INITIAL_ITEMS = [
-    { id: 'boiler2', description: 'RESERVATÓRIO (BOILER) - 200 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 2408.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
-    { id: 'boiler3', description: 'RESERVATÓRIO (BOILER) - 300 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 2898.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
-    { id: 'boiler4', description: 'RESERVATÓRIO (BOILER) - 400 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 3315.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
-    { id: 'boiler5', description: 'RESERVATÓRIO (BOILER) - 500 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 3864.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
-    { id: 'boiler6', description: 'RESERVATÓRIO (BOILER) - 600 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 4447.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
-    { id: 'boiler8', description: 'RESERVATÓRIO (BOILER) - 800 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 5315.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
-    { id: 'boiler10', description: 'RESERVATÓRIO (BOILER) - 1000 LITROS BAIXA PRESSÃO KISOLTEC', unitPrice: 6157.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler2', description: 'RESERVATÓRIO DE 200 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 2408.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler3', description: 'RESERVATÓRIO DE 300 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 2898.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler4', description: 'RESERVATÓRIO DE 400 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 3315.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler5', description: 'RESERVATÓRIO DE 500 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 3864.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler6', description: 'RESERVATÓRIO DE 600 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 4447.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler8', description: 'RESERVATÓRIO DE 800 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 5315.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
+    { id: 'boiler10', description: 'RESERVATÓRIO DE 1000 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 6157.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
     { id: 'placas', description: 'COLETORES SOLAR KISOLTEC - MODELO ULTRATEC 1.50x0.90', unitPrice: 1220.00, qty: 0, details: 'Máximo aproveitamento por m², Certificado pelo INMETRO e Selo PROCEL.' },
     { id: 'placas2', description: 'COLETORES SOLAR KISOLTEC - MODELO ULTRATEC 2.00x0.90', unitPrice: 1536.00, qty: 0, details: 'Máximo aproveitamento por m², Certificado pelo INMETRO e Selo PROCEL.' },
     { id: 'pressurizador', description: 'PRESSURIZADOR MAX POWER (EM INOX)', unitPrice: 1425.00, qty: 0, details: 'Garante pressão ideal pós-boiler.' },
@@ -44,7 +46,7 @@ const useBudget = () => {
         telefone: '',
         email: '',
         endereco: '',
-        cidade: '',
+        cidade: 'Sorocaba/SP',
     });
 
     // Estado dos Itens
@@ -180,7 +182,7 @@ const useBudget = () => {
 };
 
 
-// --- COMPONENTES DE APRESENTAÇÃO (Inalterados, exceto a remoção de imports Firebase) ---
+// --- COMPONENTES DE APRESENTAÇÃO ---
 const ClientForm = ({ client, handleClientChange }) => (
     <div className="bg-white p-6 shadow-xl rounded-lg border-t-4 border-blue-500">
         <h2 className="text-xl font-semibold mb-4 flex items-center text-gray-700">
@@ -365,18 +367,59 @@ const PriceSettings = ({ userId, isAuthReady, basePrices, saveBasePrices, loadin
     );
 };
 
+// Componente do Botão de WhatsApp (Novo)
+const WhatsappButton = ({ client, onGeneratePdf, isGenerating }) => {
+    const nomeCliente = client.nome || 'Cliente';
+    const telefone = client.telefone.replace(/\D/g, ''); // Remove não-dígitos para o link
+    
+    // Mensagem de texto para o WhatsApp (Sem o anexo do PDF)
+    const whatsappMessage = `Olá ${nomeCliente}, aqui está o seu orçamento de Aquecimento Solar. Por favor, baixe o arquivo PDF gerado e anexe-o nesta conversa.`;
+    
+    // Fallback URL para o WhatsApp
+    const whatsappUrl = `https://wa.me/${telefone}?text=${encodeURIComponent(whatsappMessage)}`;
+
+    const handleClick = () => {
+        // 1. Gerar o PDF
+        onGeneratePdf();
+
+        // 2. Abrir o WhatsApp (com o PDF salvo, o usuário deve anexar manualmente)
+        // Isso é o melhor que podemos fazer no frontend sem um backend para upload do arquivo.
+        setTimeout(() => {
+            window.open(whatsappUrl, '_blank');
+        }, 1000); // Dá um pequeno tempo para o download começar/completar antes de abrir o WhatsApp
+    };
+
+    return (
+        <button
+            onClick={handleClick}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 flex items-center disabled:opacity-50"
+            disabled={isGenerating || !client.telefone}
+            title={!client.telefone ? "Preencha o telefone do cliente para enviar pelo WhatsApp" : "Gera o PDF e abre o WhatsApp (o usuário deve anexar o PDF)"}
+        >
+            {isGenerating ? (
+                <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+            ) : (
+                // Um ícone de WhatsApp seria ideal, mas usaremos um similar do Lucide
+                <Send className="w-5 h-5 mr-2" /> 
+            )}
+            {isGenerating ? 'Gerando PDF...' : 'Enviar por WhatsApp'}
+        </button>
+    );
+};
+
+
 const BudgetView = React.forwardRef(({ client, items, totalValue, userId }, ref) => (
     <div ref={ref} data-userid={userId} className="budget-view p-8 bg-white shadow-xl rounded-lg print:shadow-none print:p-0">
         <div className="header-print text-center border-b-2 border-cyan-500 pb-4 mb-6">
             <h1 className="text-3xl font-bold text-cyan-600 uppercase tracking-widest">A CASA DOS AQUECEDORES</h1>
-            <p className="text-sm text-gray-600 mt-1">SOLAR, ELÉTRICO, GÁS, FILTRO CENTRAL E BOMBAS DE CALOR P/ PISCINAS.</p>
-            <p className="text-xs text-gray-500 mt-2">FONE (15) 3227-3025 - SOROCABA/SP</p>
+            <p className="text-sm text-gray-600 mt-1">SOLAR, ELÉTRICO, GÁS E BOMBAS DE CALOR P/ PISCINAS.</p>
+            <p className="text-xs text-gray-500 mt-2">FONE (15) 3227-3025 / (15) 99705-0935- SOROCABA/SP</p>
             <p className="text-xs text-gray-500">E-mail: casa.aquecedores@yahoo.com.hr</p>
         </div>
 
         <div className="client-info-print grid grid-cols-2 gap-4 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <div className="col-span-2 text-lg font-bold text-blue-800 flex items-center mb-2 border-b border-blue-300 pb-1">
-                <User className="w-5 h-5 mr-2" /> DADOS DO CLIENTE
+                <User className="text-sm text-gray-600 mt-1" /> DADOS DO CLIENTE
             </div>
             <div className="text-sm"><strong>Nome:</strong> {client.nome || '-'}</div>
             <div className="text-sm"><strong>Telefone:</strong> {client.telefone || '-'}</div>
@@ -404,7 +447,7 @@ const BudgetView = React.forwardRef(({ client, items, totalValue, userId }, ref)
                     <tr key={item.id} className="text-gray-700 hover:bg-gray-50 transition duration-100">
                         <td className="p-3 border-r font-medium text-center w-16">{item.qty.toFixed(0)}</td>
                         <td className="p-3 border-r">
-                            <strong className="text-base">{item.description.split('(')[0].trim()}</strong>
+                            <strong className="text-sm">{item.description.split('(')[0].trim()}</strong>
                             <p className="text-xs text-gray-500 mt-0.5">{item.details}</p>
                         </td>
                         <td className="p-3 border-r text-right w-36 font-mono">{formatCurrency(item.unitPrice)}</td>
@@ -412,8 +455,8 @@ const BudgetView = React.forwardRef(({ client, items, totalValue, userId }, ref)
                     </tr>
                 ))}
                 <tr className="total-row-print bg-cyan-100 font-bold text-cyan-800">
-                    <td colSpan="3" className="p-3 text-right text-lg border-r-0">TOTAL GERAL</td>
-                    <td className="p-3 text-right text-xl border-l-0">{formatCurrency(totalValue)}</td>
+                    <td colSpan="3" className="p-3 text-right text-md border-r-0">TOTAL GERAL</td>
+                    <td className="p-3 text-right text-md border-l-0">{formatCurrency(totalValue)}</td>
                 </tr>
             </tbody>
         </table>
@@ -485,10 +528,49 @@ const App = () => {
 
     const budgetRef = useRef(null);
     const [isSavingBudget, setIsSavingBudget] = useState(false);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false); // Novo estado para o PDF
 
     // 2. Handlers de Ação
+
+    // Função para gerar o PDF e forçar o download (Usada pelo Print e Whatsapp)
+    const generateAndDownloadPdf = useCallback(async (isSilent = false) => {
+        if (!budgetRef.current) return;
+
+        // 🚨 NOVO: Carregamento Dinâmico do html2pdf.js
+        // Isso garante que ele só será importado no LADO DO CLIENTE (navegador)
+        const html2pdf = (await import('html2pdf.js')).default;
+
+        setIsGeneratingPdf(true);
+        const nomeArquivo = `Orcamento_Solar_${client.nome.replace(/ /g, '_') || 'Cliente'}_${new Date().toISOString().substring(0, 10)}.pdf`;
+
+        // Opções para html2pdf.js
+        const options = {
+            margin: 10,
+            filename: nomeArquivo,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, logging: false, scrollY: 0, letterRendering: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        try {
+            // Usando html2pdf para gerar e salvar o PDF
+            await html2pdf().set(options).from(budgetRef.current).save();
+            if (!isSilent) {
+                 alert('PDF gerado e baixado com sucesso!');
+            }
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            alert('Erro ao gerar o PDF. Verifique o console. (Certifique-se de que está no navegador)');
+        } finally {
+            setIsGeneratingPdf(false);
+        }
+    }, [client.nome]); // A dependência client.nome está correta
+
+
+    // Handler de Impressão (Mantém a lógica de window.print() para melhor compatibilidade com o navegador)
     const handlePrint = () => {
-        if (budgetRef.current) {
+         if (budgetRef.current) {
+            // A sua lógica original que abre a janela de impressão
             const printContents = budgetRef.current.outerHTML;
             const printWindow = window.open('', '_blank');
 
@@ -524,6 +606,7 @@ const App = () => {
             printWindow.document.close();
         }
     };
+
 
     const handleSaveBudget = async () => {
         setIsSavingBudget(true);
@@ -574,10 +657,17 @@ const App = () => {
 
                         {/* Ações */}
                         <div className="flex justify-end space-x-4 no-print">
+                            {/* NOVO BOTÃO DE WHATSAPP */}
+                            <WhatsappButton 
+                                client={client} 
+                                onGeneratePdf={() => generateAndDownloadPdf(true)} // Gera o PDF silenciosamente
+                                isGenerating={isGeneratingPdf}
+                            />
+                            
                             <button
                                 onClick={handleSaveBudget}
                                 className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 flex items-center disabled:opacity-50"
-                                disabled={isSavingBudget}
+                                disabled={isSavingBudget || isGeneratingPdf}
                             >
                                 {isSavingBudget ? (
                                     <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
@@ -588,7 +678,8 @@ const App = () => {
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 flex items-center"
+                                className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 flex items-center disabled:opacity-50"
+                                disabled={isGeneratingPdf}
                             >
                                 <Printer className="w-5 h-5 mr-2" />
                                 Imprimir / Gerar PDF
