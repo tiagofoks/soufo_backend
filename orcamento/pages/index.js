@@ -1,14 +1,49 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { User, DollarSign, Printer, Save, RefreshCw, ArrowRight, Home, Mail, Phone, MapPin, Package, Sun, Ruler, Clock, AlertTriangle, Send, Mail as WhatsappIcon } from 'lucide-react';
-// Importação da biblioteca de geração de PDF (Assegure-se de que está instalada!)
+import { User, DollarSign, Printer, Save, RefreshCw, ArrowRight, Home, Mail, Phone, MapPin, Package, Sun, Ruler, Clock, AlertTriangle, Send } from 'lucide-react';
+
+// 🚨 NOVO: Importação do Firebase
+import { initializeApp } from 'firebase/app';
+import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc, 
+    collection, 
+    serverTimestamp, 
+} from 'firebase/firestore';
+
+// Importação da biblioteca de geração de PDF
+// Certifique-se de que 'html2pdf.js' está instalado!
 // import html2pdf from 'html2pdf.js'; 
 
-// Variáveis Globais (Simplificadas)
-const APP_ID = 'local-budget-app'; // ID local fictício
-const BUDGETS_STORAGE_KEY = `${APP_ID}_budgets`; // Chave para salvar a lista de orçamentos
-const BASE_PRICES_STORAGE_KEY = `${APP_ID}_base_prices`; // Chave para salvar os preços base
+// 🚨 NOVO: Configurações do Firebase (SUBSTITUA PELAS SUAS CHAVES!)
+const firebaseConfig = {
+  apiKey: "AIzaSyBTeQSKtaXdm5tI9APbniKGbvwhQP205JU",
+  authDomain: "orcamento-44592.firebaseapp.com",
+  projectId: "orcamento-44592",
+  storageBucket: "orcamento-44592.firebasestorage.app",
+  messagingSenderId: "946840065878",
+  appId: "1:946840065878:web:432102f1113927e6cb28f7",
+  measurementId: "G-M1S34G3D62"
+};
 
-// --- Dados Iniciais ---
+// 🚨 Inicialização do Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Variáveis Globais (Novas chaves para Firestore)
+const APP_ID = 'local-budget-app'; 
+// 🚨 NOVO: Chaves de Coleção e Documento
+const COLLECTIONS = {
+    BASE_PRICES: 'base_prices',
+    BUDGETS: 'budgets',
+};
+const DOC_IDS = {
+    BASE_PRICES_DOC: 'global_prices', // Documento único para todos os preços base
+};
+
+
+// --- Dados Iniciais (MANTIDOS) ---
 const INITIAL_ITEMS = [
     { id: 'boiler2', description: 'RESERVATÓRIO DE 200 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 2408.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
     { id: 'boiler3', description: 'RESERVATÓRIO DE 300 LTS BAIXA PRESSÃO KISOLTEC', unitPrice: 2898.00, qty: 0, details: 'Reservatório interno em INOX 304, Revestimento em Poliuretano Expandido, Apoio elétrico 3000W.' },
@@ -25,22 +60,21 @@ const INITIAL_ITEMS = [
     { id: 'mao_obra', description: 'MÃO DE OBRA DE INSTALAÇÃO (ESTIMATIVA)', unitPrice: 950.00, qty: 0, details: 'Instalação e testes do sistema completo.' },
 ];
 
-// --- Funções Utilitárias ---
+// --- Funções Utilitárias (MANTIDAS) ---
 const cleanNumber = (value) => parseFloat(String(value).replace(/[^0-9,.]/g, '').replace(',', '.')) || 0;
 const formatCurrency = (value) => `R$ ${parseFloat(value).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 
 // Geração de ID simples e único (para orçamentos locais)
 const generateLocalId = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
 
-// --- CUSTOM HOOK: useBudget (Lógica de Estado e LocalStorage) ---
+// --- CUSTOM HOOK: useBudget (Lógica de Estado e FIREBASE) ---
 const useBudget = () => {
-    // Simulando autenticação e carregamento de preços base
     const [loading, setLoading] = useState(true);
-    const [userId, setUserId] = useState('user_local_123'); // ID Fixo para uso local
+    const [userId, setUserId] = useState('user_local_123'); // ID Fixo (idealmente viria de um Auth do Firebase)
     const [isAuthReady, setIsAuthReady] = useState(true); // Sempre pronto localmente
-    const [basePrices, setBasePrices] = useState({}); // Preços base carregados do localStorage
+    const [basePrices, setBasePrices] = useState({}); 
 
-    // Estado do Cliente
+    // Estado do Cliente (MANTIDO)
     const [client, setClient] = useState({
         nome: '',
         telefone: '',
@@ -49,36 +83,58 @@ const useBudget = () => {
         cidade: 'Sorocaba/SP',
     });
 
-    // Estado dos Itens
+    // Estado dos Itens (MANTIDO)
     const [items, setItems] = useState(INITIAL_ITEMS.map(item => ({
         ...item,
         unitPrice: item.unitPrice,
         qty: item.qty,
     })));
 
-    // EFEITO DE CARREGAMENTO INICIAL (Preços Base)
+    // 🚨 EFEITO DE CARREGAMENTO INICIAL (Preços Base do Firestore)
     useEffect(() => {
-        // Roda apenas no cliente (navegador)
-        if (typeof window !== 'undefined' && window.localStorage) {
-            const savedPrices = localStorage.getItem(BASE_PRICES_STORAGE_KEY);
-            const loadedPrices = savedPrices ? JSON.parse(savedPrices) : {};
-            
-            setBasePrices(loadedPrices);
+        const loadBasePricesFromFirestore = async () => {
+            setLoading(true);
+            try {
+                // Referência ao documento de preços
+                const docRef = doc(db, COLLECTIONS.BASE_PRICES, DOC_IDS.BASE_PRICES_DOC);
+                const docSnap = await getDoc(docRef);
 
-            // Aplica os preços base aos itens atuais
-            setItems(prevItems => prevItems.map(item => {
-                const persistedPrice = cleanNumber(loadedPrices[item.id]);
-                const newPrice = persistedPrice > 0 ? persistedPrice : item.unitPrice; 
-                return { 
-                    ...item, 
-                    unitPrice: newPrice 
-                };
-            }));
+                let loadedPrices = {};
+
+                if (docSnap.exists()) {
+                    // Carrega os dados se o documento existir
+                    loadedPrices = docSnap.data();
+                } else {
+                    console.log("Documento de Preços Base não encontrado, usando defaults.");
+                    // Se não existir, o loadedPrices fica vazio, e os defaults serão usados abaixo
+                }
+                
+                setBasePrices(loadedPrices);
+
+                // Aplica os preços base carregados (ou o default inicial) aos itens atuais
+                setItems(prevItems => prevItems.map(item => {
+                    const persistedPrice = cleanNumber(loadedPrices[item.id]);
+                    const newPrice = persistedPrice > 0 ? persistedPrice : item.unitPrice; 
+                    return { 
+                        ...item, 
+                        unitPrice: newPrice 
+                    };
+                }));
+
+            } catch (error) {
+                console.error('Erro ao carregar preços base do Firestore:', error);
+                // Em caso de erro, usa os preços iniciais definidos
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (isAuthReady) {
+            loadBasePricesFromFirestore();
         }
-        setLoading(false);
-    }, []);
+    }, [isAuthReady]);
 
-    // Handlers
+    // Handlers (MANTIDOS)
     const handleClientChange = useCallback((field, value) => {
         setClient(prev => ({ ...prev, [field]: value }));
     }, []);
@@ -96,12 +152,12 @@ const useBudget = () => {
         );
     }, []);
 
-    // Cálculo do Total
+    // Cálculo do Total (MANTIDO)
     const totalValue = useMemo(() => {
         return items.reduce((sum, item) => sum + (item.qty * item.unitPrice), 0);
     }, [items]);
     
-    // Salvar Preços Base no LocalStorage
+    // 🚨 Salvar Preços Base no Firestore (Substituindo LocalStorage)
     const saveBasePrices = useCallback(async (pricesToSave) => {
         setLoading(true);
         try {
@@ -111,25 +167,27 @@ const useBudget = () => {
                 dataToSave[id] = cleanNumber(pricesToSave[id]);
             });
 
-            localStorage.setItem(BASE_PRICES_STORAGE_KEY, JSON.stringify(dataToSave));
+            const docRef = doc(db, COLLECTIONS.BASE_PRICES, DOC_IDS.BASE_PRICES_DOC);
+            
+            // O setDoc com merge: true garante que apenas os campos fornecidos sejam atualizados
+            await setDoc(docRef, dataToSave, { merge: true });
+
             setBasePrices(dataToSave); // Atualiza o estado para refletir a mudança
             return true;
         } catch (error) {
-            console.error('Erro ao salvar preços base no localStorage:', error);
+            console.error('Erro ao salvar preços base no Firestore:', error);
             return false;
         } finally {
             setLoading(false);
         }
     }, []);
     
-    // Salvar Orçamento no LocalStorage
+    // 🚨 Salvar Orçamento no Firestore (Substituindo LocalStorage)
     const saveBudget = useCallback(async () => {
         setLoading(true);
-        const docId = generateLocalId(); // Gera um ID local
 
         try {
             const budgetData = {
-                id: docId,
                 client,
                 items: items.map(item => ({
                     description: item.description,
@@ -140,25 +198,19 @@ const useBudget = () => {
                 })),
                 totalValue,
                 createdBy: userId,
-                createdAt: new Date().toISOString(),
-                date: new Date().toLocaleDateString('pt-BR'),
+                createdAt: serverTimestamp(), // Data e hora do servidor do Firebase
+                date: new Date().toLocaleDateString('pt-BR'), // Data formatada
                 guarantees: ['03 ANOS P/BOILER', '03 ANOS P/COLETOR SOLAR', '01 ANO P/PRESSURIZADORES'],
                 conditions: 'À COMBINAR',
             };
 
-            // 1. Carrega orçamentos existentes
-            const existingBudgetsString = localStorage.getItem(BUDGETS_STORAGE_KEY);
-            const existingBudgets = existingBudgetsString ? JSON.parse(existingBudgetsString) : [];
-
-            // 2. Adiciona o novo orçamento
-            existingBudgets.push(budgetData);
-
-            // 3. Salva a lista atualizada
-            localStorage.setItem(BUDGETS_STORAGE_KEY, JSON.stringify(existingBudgets));
+            // Adiciona um novo documento à coleção 'budgets' e o Firestore gera o ID
+            const docRef = doc(collection(db, COLLECTIONS.BUDGETS));
+            await setDoc(docRef, budgetData);
             
-            return docId;
+            return docRef.id;
         } catch (error) {
-            console.error('Erro ao salvar orçamento no localStorage:', error);
+            console.error('Erro ao salvar orçamento no Firestore:', error);
             return null;
         } finally {
             setLoading(false);
@@ -182,7 +234,7 @@ const useBudget = () => {
 };
 
 
-// --- COMPONENTES DE APRESENTAÇÃO ---
+// --- COMPONENTES DE APRESENTAÇÃO (Apenas alteração no texto dos botões e alertas) ---
 const ClientForm = ({ client, handleClientChange }) => (
     <div className="bg-white p-6 shadow-xl rounded-lg border-t-4 border-blue-500">
         <h2 className="text-xl font-semibold mb-4 flex items-center text-gray-700">
@@ -299,10 +351,11 @@ const PriceSettings = ({ userId, isAuthReady, basePrices, saveBasePrices, loadin
 
     const handleSave = async () => {
         setIsSaving(true);
+        // 🚨 Alterado: Salva no Firestore
         const success = await saveBasePrices(editingPrices);
 
         if (success) {
-            alert('Preços base salvos com sucesso no LocalStorage!');
+            alert('Preços base salvos com sucesso no Firestore!');
         } else {
             alert('Erro ao salvar preços base. Verifique o console.');
         }
@@ -356,37 +409,31 @@ const PriceSettings = ({ userId, isAuthReady, basePrices, saveBasePrices, loadin
                     ) : (
                         <Save className="w-5 h-5 mr-2" />
                     )}
-                    {isSaving ? 'Salvando...' : 'Salvar Preços Base Localmente'}
+                    {/* 🚨 Alterado: Salvar Preços Base no Firestore */}
+                    {isSaving ? 'Salvando...' : 'Salvar Preços Base no Firestore'}
                 </button>
             </div>
             <p className="mt-4 text-xs text-gray-500 flex items-start">
                 <AlertTriangle className="w-4 h-4 mr-1 mt-0.5 flex-shrink-0 text-red-400" />
-                Estes preços são persistentes (salvos no **LocalStorage** do seu navegador) e aplicados automaticamente.
+                Estes preços são persistentes (**Firestore**) e aplicados automaticamente.
             </p>
         </div>
     );
 };
 
-// Componente do Botão de WhatsApp (Novo)
+// Componente do Botão de WhatsApp (MANTIDO)
 const WhatsappButton = ({ client, onGeneratePdf, isGenerating }) => {
     const nomeCliente = client.nome || 'Cliente';
-    const telefone = client.telefone.replace(/\D/g, ''); // Remove não-dígitos para o link
+    const telefone = client.telefone.replace(/\D/g, ''); 
     
-    // Mensagem de texto para o WhatsApp (Sem o anexo do PDF)
     const whatsappMessage = `Olá ${nomeCliente}, aqui está o seu orçamento de Aquecimento Solar. Por favor, baixe o arquivo PDF gerado e anexe-o nesta conversa.`;
-    
-    // Fallback URL para o WhatsApp
     const whatsappUrl = `https://wa.me/${telefone}?text=${encodeURIComponent(whatsappMessage)}`;
 
     const handleClick = () => {
-        // 1. Gerar o PDF
         onGeneratePdf();
-
-        // 2. Abrir o WhatsApp (com o PDF salvo, o usuário deve anexar manualmente)
-        // Isso é o melhor que podemos fazer no frontend sem um backend para upload do arquivo.
         setTimeout(() => {
             window.open(whatsappUrl, '_blank');
-        }, 1000); // Dá um pequeno tempo para o download começar/completar antes de abrir o WhatsApp
+        }, 1000); 
     };
 
     return (
@@ -399,7 +446,6 @@ const WhatsappButton = ({ client, onGeneratePdf, isGenerating }) => {
             {isGenerating ? (
                 <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
             ) : (
-                // Um ícone de WhatsApp seria ideal, mas usaremos um similar do Lucide
                 <Send className="w-5 h-5 mr-2" /> 
             )}
             {isGenerating ? 'Gerando PDF...' : 'Enviar por WhatsApp'}
@@ -528,22 +574,19 @@ const App = () => {
 
     const budgetRef = useRef(null);
     const [isSavingBudget, setIsSavingBudget] = useState(false);
-    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false); // Novo estado para o PDF
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false); 
 
     // 2. Handlers de Ação
 
-    // Função para gerar o PDF e forçar o download (Usada pelo Print e Whatsapp)
+    // Função para gerar o PDF e forçar o download (MANTIDA)
     const generateAndDownloadPdf = useCallback(async (isSilent = false) => {
         if (!budgetRef.current) return;
 
-        // 🚨 NOVO: Carregamento Dinâmico do html2pdf.js
-        // Isso garante que ele só será importado no LADO DO CLIENTE (navegador)
         const html2pdf = (await import('html2pdf.js')).default;
 
         setIsGeneratingPdf(true);
         const nomeArquivo = `Orcamento_Solar_${client.nome.replace(/ /g, '_') || 'Cliente'}_${new Date().toISOString().substring(0, 10)}.pdf`;
 
-        // Opções para html2pdf.js
         const options = {
             margin: 10,
             filename: nomeArquivo,
@@ -553,7 +596,6 @@ const App = () => {
         };
 
         try {
-            // Usando html2pdf para gerar e salvar o PDF
             await html2pdf().set(options).from(budgetRef.current).save();
             if (!isSilent) {
                  alert('PDF gerado e baixado com sucesso!');
@@ -564,17 +606,15 @@ const App = () => {
         } finally {
             setIsGeneratingPdf(false);
         }
-    }, [client.nome]); // A dependência client.nome está correta
+    }, [client.nome]); 
 
 
-    // Handler de Impressão (Mantém a lógica de window.print() para melhor compatibilidade com o navegador)
+    // Handler de Impressão (MANTIDO)
     const handlePrint = () => {
          if (budgetRef.current) {
-            // A sua lógica original que abre a janela de impressão
             const printContents = budgetRef.current.outerHTML;
             const printWindow = window.open('', '_blank');
 
-            // Adiciona estilos Tailwind compatíveis com impressão e o HTML do orçamento
             printWindow.document.write(`
                 <html>
                 <head>
@@ -583,7 +623,6 @@ const App = () => {
                     <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto+Mono:wght@400;700&display=swap');
                     body { font-family: 'Inter', sans-serif; margin: 0; padding: 20px; color: #1f2937; }
-                    /* Replicando estilos do BudgetView para o contexto da impressão */
                     .budget-view { max-width: 800px; margin: 0 auto; }
                     .header-print h1 { font-size: 24px !important; }
                     .total-row-print td { background-color: #DBEAFE !important; color: #06B6D4 !important; }
@@ -592,7 +631,6 @@ const App = () => {
                 <body class="p-8">
                     ${printContents}
                     <script>
-                    // Timeout para garantir que os estilos sejam carregados antes de imprimir
                     setTimeout(() => {
                         window.print();
                         window.onafterprint = function() {
@@ -610,9 +648,10 @@ const App = () => {
 
     const handleSaveBudget = async () => {
         setIsSavingBudget(true);
-        const docId = await saveBudget();
+        // 🚨 Alterado: Salva no Firestore e recebe o ID
+        const docId = await saveBudget(); 
         if (docId) {
-            alert(`Orçamento salvo com sucesso no LocalStorage! ID: ${docId}`);
+            alert(`Orçamento salvo com sucesso no Firestore! ID: ${docId}`);
         } else {
             alert('Erro ao salvar o orçamento. Verifique o console.');
         }
@@ -643,7 +682,8 @@ const App = () => {
                         <Sun className="w-8 h-8 mr-3 text-yellow-300" />
                         A Casa dos Aquecedores
                     </h1>
-                    <p className="mt-1 text-cyan-100">Salvamento Local (LocalStorage).</p>
+                    {/* 🚨 Alterado: Indica Salvamento em Nuvem */}
+                    <p className="mt-1 text-cyan-100">Salvamento em Nuvem (Firestore).</p> 
                 </div>
 
                 {/* Colunas: Formulário de Edição vs. Preços Base */}
@@ -657,10 +697,10 @@ const App = () => {
 
                         {/* Ações */}
                         <div className="flex justify-end space-x-4 no-print">
-                            {/* NOVO BOTÃO DE WHATSAPP */}
+                            {/* BOTÃO DE WHATSAPP (MANTIDO) */}
                             <WhatsappButton 
                                 client={client} 
-                                onGeneratePdf={() => generateAndDownloadPdf(true)} // Gera o PDF silenciosamente
+                                onGeneratePdf={() => generateAndDownloadPdf(true)} 
                                 isGenerating={isGeneratingPdf}
                             />
                             
@@ -674,7 +714,8 @@ const App = () => {
                                 ) : (
                                     <Save className="w-5 h-5 mr-2" />
                                 )}
-                                {isSavingBudget ? 'Salvando...' : 'Salvar Orçamento (LocalStorage)'}
+                                {/* 🚨 Alterado: Salvar Orçamento (Firestore) */}
+                                {isSavingBudget ? 'Salvando...' : 'Salvar Orçamento (Firestore)'} 
                             </button>
                             <button
                                 onClick={handlePrint}
