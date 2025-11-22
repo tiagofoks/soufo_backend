@@ -1,14 +1,18 @@
-// next.config.js
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ... other config settings
-  output: 'export', // Isso força o build a ser 100% estático
-  experimental: {
-    turbopack: {
-      root: './dev/orcamento', // Set this to your actual project directory
+    // 1. Essencial para exportação estática (você já tem)
+    output: 'export', 
+    
+    // 2. BasePath: Usado para navegação interna
+    basePath: '/orcamento', 
+    
+    // 3. AssetPrefix: O MAIS CRUCIAL para arquivos JS/CSS (Onde está o 404)
+    assetPrefix: '/orcamento/', // Note a barra final
+    
+    // 4. Imagens (você já tem)
+    images: {
+        unoptimized: true, 
     },
-  },
 };
 
 module.exports = nextConfig;

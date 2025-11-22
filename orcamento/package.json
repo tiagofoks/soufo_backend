@@ -8,8 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d out"
+    "predeploy": "next build",
+    "deploy": "npm run build && (type nul > out/.nojekyll) && gh-pages -d out",
+    "tailwind-init": "tailwindcss init -p"
   },
   "dependencies": {
     "firebase": "^12.6.0",
@@ -21,10 +22,12 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "autoprefixer": "^10.4.22",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "gh-pages": "^6.3.0",
-    "tailwindcss": "^4"
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17"
   }
 }
