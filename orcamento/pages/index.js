@@ -619,6 +619,7 @@ const App = () => {
                 <html>
                 <head>
                     <title>Orçamento Solar</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
                     <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Roboto+Mono:wght@400;700&display=swap');
                     body { font-family: 'Inter', sans-serif; margin: 0; padding: 20px; color: #1f2937; }
@@ -671,6 +672,8 @@ const App = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
+            {/* Adiciona o script do tailwind (necessário se não estiver usando o setup padrão do Next/Tailwind) */}
+            <script src="https://cdn.tailwindcss.com"></script> 
             <div className="max-w-7xl mx-auto space-y-8">
 
                 {/* Cabeçalho */}
