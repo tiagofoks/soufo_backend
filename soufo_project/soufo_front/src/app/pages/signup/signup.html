@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="card">
+    <h2>Cadastro</h2>
+    <input placeholder="Nome">
+    <input placeholder="Sobrenome">
+    <input placeholder="Email">
+    <input placeholder="Telefone">
+    <input type="password" placeholder="Senha">
+    <input type="password" placeholder="Confirmar Senha">
+
+    <form [formGroup]="signupForm" (ngSubmit)="save()">
+  <input formControlName="nome" placeholder="Nome">
+  <input formControlName="sobrenome" placeholder="Sobrenome">
+  <div class="actions">
+    <button type="submit" [disabled]="signupForm.invalid">Cadastrar</button>
+    <button type="button" (click)="toggleModal()">Cancelar</button>
+  </div>
+</form>
+
+<form [formGroup]="signupForm" (ngSubmit)="save()">
+  <input type="password" formControlName="senha" placeholder="Senha">
+  <input type="password" formControlName="confirmarSenha" placeholder="Confirmar Senha">
+
+  <p *ngIf="signupForm.errors?.['passwordMismatch'] && signupForm.get('confirmarSenha')?.touched" style="color: red;">
+    As senhas não coincidem.
+  </p>
+
+  <div class="actions">
+    <button type="submit" [disabled]="signupForm.invalid">Cadastrar</button>
+    <button type="button" (click)="toggleModal()">Cancelar</button>
+  </div>
+</form>
+
+<div *ngIf="signupForm.errors?.['passwordMismatch'] && signupForm.get('confirmarSenha')?.touched">
+  <small style="color: red;">As senhas não coincidem.</small>
+</div>
+
+    <div class="actions">
+      <button (click)="save()">Cadastrar</button>
+      <button class="cancel" (click)="toggleModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" *ngIf="showModal">
+  <div class="modal-content">
+    <p>Deseja realmente cancelar?</p>
+    <button (click)="confirmCancel()">Sim</button>
+    <button (click)="toggleModal()">Não</button>
+  </div>
+</div>
