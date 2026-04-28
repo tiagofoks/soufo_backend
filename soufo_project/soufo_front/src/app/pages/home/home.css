@@ -1,0 +1,28 @@
+/* Efeito suave de pulsação para o selo de fundo */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 0.15; }
+  50% { transform: scale(1.05); opacity: 0.25; }
+}
+
+.animate-pulse {
+  animation: pulse-slow 8s infinite ease-in-out;
+}
+
+/* Esconder as setas padrão do input date para manter o visual tech */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(175deg);
+  cursor: pointer;
+}
+
+/* Scrollbar do modal para combinar com Dark Mode */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}

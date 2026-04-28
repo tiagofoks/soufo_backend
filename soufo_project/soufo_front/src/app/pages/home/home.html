@@ -1,4 +1,142 @@
-<div class="welcome-container">
-  <h1>Seja bem-vindo, Nome!</h1>
-  <button (click)="logout()">Sair</button>
+<div class="min-h-screen bg-slate-950 text-slate-200 relative overflow-hidden font-sans">
+
+  <div class="absolute -top-10 -left-10 w-64 h-64 opacity-15 pointer-events-none animate-pulse z-0">
+    <img src="assets/selo-soufo.png" alt="Selo Background" class="w-full h-full object-contain">
+  </div>
+
+  <header class="absolute top-0 right-0 p-6 z-50">
+    <div class="relative">
+      <button (click)="toggleUserMenu()"
+              class="flex items-center justify-center w-12 h-12 rounded-full border border-slate-700 bg-slate-900/50 hover:border-cyan-500 transition-all shadow-lg overflow-hidden">
+        <span class="text-cyan-400 font-bold text-sm">TS</span>
+      </button>
+
+      <div *ngIf="userMenuOpen"
+           class="absolute top-14 right-0 w-48 bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-2 py-3">
+        <button class="w-full text-left px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 rounded-lg transition-all">Minha Conta</button>
+        <button class="w-full text-left px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 rounded-lg transition-all">Eventos</button>
+        <button class="w-full text-left px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 rounded-lg transition-all">Pontos</button>
+        <button class="w-full text-left px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-cyan-400 hover:bg-slate-800/50 rounded-lg transition-all">Projetos</button>
+        <hr class="my-2 border-slate-800">
+        <button class="w-full text-left px-4 py-2 text-xs font-semibold uppercase tracking-widest text-red-500 hover:bg-red-500/10 rounded-lg transition-all">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex flex-col items-center justify-center min-h-screen px-4">
+    <div class="text-center mb-10">
+      <h1 class="text-5xl font-extrabold text-slate-100 tracking-tighter mb-4">
+        Bem-vindo à <span class="bg-clip-text text-transparent bg-gradient-to-r from-violet-500 to-cyan-400">Soufo Home</span>
+      </h1>
+      <p class="text-slate-500 uppercase tracking-[0.4em] text-xs font-medium">Inovações que transformam ideias em ação</p>
+    </div>
+
+    <button (click)="toggleEventModal()"
+            class="group relative px-8 py-4 bg-gradient-to-r from-violet-600 to-cyan-500 rounded-2xl font-bold text-white shadow-2xl shadow-cyan-950/40 hover:brightness-110 active:scale-95 transition-all">
+      <span class="flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Cadastrar Novo Evento
+      </span>
+    </button>
+  </main>
+
+  <div *ngIf="eventModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+
+      <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+        <h2 class="text-xl font-bold text-slate-100">Configurar Novo Hackathon</h2>
+        <button (click)="toggleEventModal()" class="text-slate-500 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <form [formGroup]="eventForm" (ngSubmit)="saveEvent()" class="p-8 space-y-6 overflow-y-auto">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Nome do Hackathon</label>
+            <input formControlName="nome" type="text" placeholder="Ex: Soufo Dev Challenge" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Empresa Responsável</label>
+            <input formControlName="empresa" type="text" placeholder="Pinguim Produções" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Local / Link do Evento</label>
+          <input formControlName="local" type="text" placeholder="Hibrído, Sorocaba-SP ou URL" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50">
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Início Data</label>
+            <input
+              formControlName="dataInicio"
+              type="date"
+              [min]="minDate"
+              class="w-full bg-slate-950 border rounded-xl px-4 py-3 text-slate-200 outline-none transition-all"
+              [ngClass]="eventForm.get('dataInicio')?.errors?.['pastDate'] && eventForm.get('dataInicio')?.touched
+                        ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]'
+                        : 'border-slate-800 focus:ring-2 focus:ring-cyan-500/50'"
+            >
+
+            <div class="h-4"> <p *ngIf="eventForm.get('dataInicio')?.errors?.['pastDate'] && eventForm.get('dataInicio')?.touched"
+                class="text-[9px] text-red-400 font-bold uppercase tracking-tight ml-1 animate-pulse">
+                A data não pode ser anterior a hoje.
+              </p>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">Hora</label>
+            <input formControlName="horaInicio" type="time" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-3 text-sm text-slate-200 outline-none">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">Fim Data</label>
+            <input formControlName="dataFim" type="date" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-3 text-sm text-slate-200 outline-none">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-500 uppercase">Hora</label>
+            <input formControlName="horaFim" type="time" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2 py-3 text-sm text-slate-200 outline-none">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Apoiadores e Patrocinadores</label>
+          <textarea formControlName="apoiadores" placeholder="Separe por vírgulas..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 h-20"></textarea>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">E-mail para Inscrição</label>
+          <input formControlName="email" type="email" placeholder="hackathon@soufo.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Foto do Evento</label>
+          <div class="flex items-center justify-center w-full">
+            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-800 border-dashed rounded-2xl cursor-pointer bg-slate-950/50 hover:bg-slate-800/50 transition-all">
+              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg class="w-8 h-8 mb-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                <p class="text-xs text-slate-500 uppercase tracking-wider font-bold">Clique para subir a foto</p>
+              </div>
+              <input type="file" class="hidden" (change)="onFileChange($event)" />
+            </label>
+          </div>
+        </div>
+
+      </form>
+
+      <div class="p-6 border-t border-slate-800 bg-slate-900/50 flex gap-4">
+        <button (click)="toggleEventModal()" class="flex-1 px-6 py-3 border border-slate-700 text-slate-400 font-bold rounded-xl hover:bg-slate-800 transition-all uppercase text-xs tracking-widest">Cancelar</button>
+        <button
+          type="button"
+          (click)="saveEvent()"
+          [disabled]="eventForm.invalid"
+          class="flex-1 px-6 py-3 bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold rounded-xl transition-all uppercase text-xs tracking-widest shadow-lg disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed">
+          Publicar Hackathon
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
