@@ -47,7 +47,7 @@ public class UserServiceTest {
         when(userRepository.findByEmail("test@example.com"))
                 .thenReturn(java.util.Optional.of(testUser));
 
-        var result = userRepository.findByEmail("test@example.com");
+        var result = userService.findByEmail("test@example.com");
 
         assertTrue(result.isPresent());
         assertEquals("test@example.com", result.get().getEmail());
@@ -59,19 +59,22 @@ public class UserServiceTest {
         when(userRepository.findByEmail("notfound@example.com"))
                 .thenReturn(java.util.Optional.empty());
 
-        var result = userRepository.findByEmail("notfound@example.com");
+        var result = userService.findByEmail("notfound@example.com");
 
         assertFalse(result.isPresent());
     }
 
     @Test
     void testSaveUser() {
+        when(passwordEncoder.encode(any(String.class))).thenReturn("encoded_password");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
-        var savedUser = userRepository.save(testUser);
+        var savedUser = userService.saveUser(testUser);
 
         assertNotNull(savedUser);
         assertEquals("test@example.com", savedUser.getEmail());
+        assertEquals("encoded_password", savedUser.getPassword());
+        verify(passwordEncoder, times(1)).encode(any(String.class));
         verify(userRepository, times(1)).save(testUser);
     }
 }

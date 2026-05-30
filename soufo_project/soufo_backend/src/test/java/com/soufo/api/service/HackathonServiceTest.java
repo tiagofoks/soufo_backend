@@ -45,7 +45,7 @@ public class HackathonServiceTest {
         when(hackathonRepository.findById(1L))
                 .thenReturn(Optional.of(testHackathon));
 
-        var result = hackathonRepository.findById(1L);
+        Optional<Hackathon> result = hackathonService.findById(1L);
 
         assertTrue(result.isPresent());
         assertEquals("Tech Hackathon 2026", result.get().getName());
@@ -57,7 +57,7 @@ public class HackathonServiceTest {
         when(hackathonRepository.findById(999L))
                 .thenReturn(Optional.empty());
 
-        var result = hackathonRepository.findById(999L);
+        Optional<Hackathon> result = hackathonService.findById(999L);
 
         assertFalse(result.isPresent());
     }
@@ -67,7 +67,7 @@ public class HackathonServiceTest {
         when(hackathonRepository.save(any(Hackathon.class)))
                 .thenReturn(testHackathon);
 
-        var savedHackathon = hackathonRepository.save(testHackathon);
+        var savedHackathon = hackathonService.saveHackathon(testHackathon);
 
         assertNotNull(savedHackathon);
         assertEquals("Tech Hackathon 2026", savedHackathon.getName());
