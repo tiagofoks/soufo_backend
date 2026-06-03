@@ -24,20 +24,53 @@
   </header>
 
   <main class="flex flex-col items-center justify-center min-h-screen px-4">
-    <div class="text-center mb-10">
+    <div class="w-full max-w-4xl text-center mb-10">
+      <p class="text-slate-400 uppercase tracking-[0.4em] text-xs font-medium mb-3">Olá, {{ userName }} — suas competições ao alcance</p>
       <h1 class="text-5xl font-extrabold text-slate-100 tracking-tighter mb-4">
-        Bem-vindo à <span class="bg-clip-text text-transparent bg-gradient-to-r from-violet-500 to-cyan-400">Soufo Home</span>
+        Centro de Hackathons Soufo
       </h1>
       <p class="text-slate-500 uppercase tracking-[0.4em] text-xs font-medium">Inovações que transformam ideias em ação</p>
     </div>
 
-    <button (click)="toggleEventModal()"
-            class="group relative px-8 py-4 bg-gradient-to-r from-violet-600 to-cyan-500 rounded-2xl font-bold text-white shadow-2xl shadow-cyan-950/40 hover:brightness-110 active:scale-95 transition-all">
-      <span class="flex items-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        Cadastrar Novo Evento
-      </span>
-    </button>
+    <div class="w-full max-w-5xl flex flex-col gap-6">
+      <button (click)="toggleEventModal()"
+              class="self-center group relative px-8 py-4 bg-gradient-to-r from-violet-600 to-cyan-500 rounded-2xl font-bold text-white shadow-2xl shadow-cyan-950/40 hover:brightness-110 active:scale-95 transition-all">
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Cadastrar Novo Evento
+        </span>
+      </button>
+
+      <section class="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 shadow-2xl shadow-slate-950/20">
+        <div class="flex items-center justify-between mb-6 gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-100">Hackathons cadastrados</h2>
+            <p class="text-slate-500 text-sm">Acompanhe os eventos cadastrados e abra novas oportunidades.</p>
+          </div>
+        </div>
+
+        <div *ngIf="hackathons.length === 0" class="text-slate-400 text-sm py-12 text-center">
+          Nenhum hackathon cadastrado ainda. Crie o primeiro usando o botão acima.
+        </div>
+
+        <div *ngIf="hackathons.length > 0" class="grid gap-5 sm:grid-cols-2">
+          <div *ngFor="let hackathon of hackathons" class="rounded-3xl border border-slate-800 p-5 bg-slate-950/80 shadow-lg shadow-slate-950/20">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-lg font-semibold text-slate-100">{{ hackathon.title }}</h3>
+                <p class="text-slate-500 text-sm mt-2">{{ hackathon.location || 'Local não informado' }}</p>
+              </div>
+              <span class="text-[11px] uppercase tracking-[0.2em] font-bold text-cyan-400">{{ hackathon.status }}</span>
+            </div>
+            <p class="mt-4 text-slate-400 text-sm leading-relaxed whitespace-pre-line">{{ hackathon.description }}</p>
+            <div class="mt-5 text-slate-500 text-xs uppercase tracking-[0.2em] flex flex-col gap-1">
+              <span>Início: {{ hackathon.startDate | date:'medium' }}</span>
+              <span>Fim: {{ hackathon.endDate | date:'medium' }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 
   <div *ngIf="eventModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">

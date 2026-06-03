@@ -1,13 +1,31 @@
 package com.soufo.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @JsonIgnore
+    @Column(nullable = false)
     private String password;
+
+    @Column(name = "first_name")
     private String firstName;
+
+    @Column(name = "last_name")
     private String lastName;
-    private Role role;
-    private boolean enabled;
+
+    @Column(nullable = false)
+    private boolean enabled = true;
 
     public static Builder builder() {
         return new Builder();
@@ -38,11 +56,6 @@ public class User {
 
         public Builder lastName(String lastName) {
             instance.setLastName(lastName);
-            return this;
-        }
-
-        public Builder role(Role role) {
-            instance.setRole(role);
             return this;
         }
 
@@ -94,14 +107,6 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
     public boolean isEnabled() {

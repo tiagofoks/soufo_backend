@@ -22,6 +22,11 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public Optional<User> authenticate(String email, String password) {
+        return findByEmail(email)
+                .filter(user -> passwordEncoder.matches(password, user.getPassword()));
+    }
+
     public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);

@@ -1,15 +1,45 @@
 package com.soufo.api.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "hackathons")
 public class Hackathon {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
+
+    @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
+
+    @Column(name = "location")
     private String location;
-    private int maxParticipants;
+
+    @Column(name = "organizer_id")
+    private Long organizerId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.PLANNING;
+
+    public enum Status {
+        PLANNING,
+        OPEN,
+        IN_PROGRESS,
+        CLOSED,
+        ARCHIVED
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -23,8 +53,8 @@ public class Hackathon {
             return this;
         }
 
-        public Builder name(String name) {
-            instance.setName(name);
+        public Builder title(String title) {
+            instance.setTitle(title);
             return this;
         }
 
@@ -48,8 +78,13 @@ public class Hackathon {
             return this;
         }
 
-        public Builder maxParticipants(int maxParticipants) {
-            instance.setMaxParticipants(maxParticipants);
+        public Builder organizerId(Long organizerId) {
+            instance.setOrganizerId(organizerId);
+            return this;
+        }
+
+        public Builder status(Status status) {
+            instance.setStatus(status);
             return this;
         }
 
@@ -66,12 +101,12 @@ public class Hackathon {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -106,11 +141,19 @@ public class Hackathon {
         this.location = location;
     }
 
-    public int getMaxParticipants() {
-        return maxParticipants;
+    public Long getOrganizerId() {
+        return organizerId;
     }
 
-    public void setMaxParticipants(int maxParticipants) {
-        this.maxParticipants = maxParticipants;
+    public void setOrganizerId(Long organizerId) {
+        this.organizerId = organizerId;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

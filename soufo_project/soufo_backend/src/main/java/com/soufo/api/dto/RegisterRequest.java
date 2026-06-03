@@ -1,18 +1,10 @@
 package com.soufo.api.dto;
 
-public class AuthResponse {
-    private String token;
+public class RegisterRequest {
     private String email;
+    private String password;
     private String firstName;
     private String lastName;
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
 
     public String getEmail() {
         return email;
@@ -20,6 +12,14 @@ public class AuthResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService } from '../../services/user';
+import { UserService, AuthResponse } from '../../services/user';
 
 // Validador de comparação de senhas
 export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -38,7 +38,6 @@ export class SignupComponent {
       senha: ['', [Validators.required, Validators.minLength(6)]],
       confirmarSenha: ['', Validators.required]
     }, {
-      // AQUI ESTÁ A MUDANÇA: Registramos o validador no grupo
       validators: passwordMatchValidator
     });
   }
@@ -51,19 +50,29 @@ export class SignupComponent {
     this.router.navigate(['/login']);
   }
 
-  save() {
-    // Agora o valid levará em conta se as senhas batem
-    if (this.signupForm.valid) {
-      const nomeCompleto = this.signupForm.value.nome;
-      this.userService.setUserName(nomeCompleto);
-      this.router.navigate(['/login']);
-    } else {
-      // Se o erro for especificamente das senhas, você pode customizar o aviso
+  async save() {
+    if (!this.signupForm.valid) {
+      this.signupForm.markAllAsTouched();
+
       if (this.signupForm.errors?.['passwordMismatch']) {
         alert('As senhas digitadas não são iguais.');
       } else {
         alert('Por favor, preencha todos os campos corretamente.');
       }
+
+      return;
     }
+
+    const payload = this.signupForm.value;
+    const response: AuthResponse | null = await this.userService.register(payload);
+
+    if (!response) {
+      alert('Não foi possível criar a conta. Verifique os dados e tente novamente.');
+      return;
+    }
+
+    this.userService.setUserName(`${response.firstName} ${response.lastName}`);
+    this.userService.setAuthToken(response.token);
+    this.router.navigate(['/login']);
   }
 }

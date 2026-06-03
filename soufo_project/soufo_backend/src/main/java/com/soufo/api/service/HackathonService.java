@@ -4,6 +4,7 @@ import com.soufo.api.model.Hackathon;
 import com.soufo.api.repository.HackathonRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,10 @@ public class HackathonService {
 
     public Optional<Hackathon> findById(Long id) {
         return hackathonRepository.findById(id);
+    }
+
+    public List<Hackathon> findAll() {
+        return hackathonRepository.findAllByOrderByStartDateAsc();
     }
 
     public Hackathon saveHackathon(Hackathon hackathon) {

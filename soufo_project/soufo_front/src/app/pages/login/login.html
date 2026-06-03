@@ -6,18 +6,20 @@
       <p class="text-slate-500 text-[10px] font-medium tracking-[0.3em] uppercase">Inovações em ação</p>
     </div>
 
-    <form class="space-y-6">
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-6">
       <div class="space-y-1">
         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">E-mail</label>
-        <input type="email" class="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-4 py-3 text-slate-200 focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none transition-all placeholder:text-slate-800" placeholder="tiago@soufo.com">
+        <input formControlName="email" type="email" class="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-4 py-3 text-slate-200 focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none transition-all placeholder:text-slate-800" placeholder="tiago@soufo.com">
       </div>
 
       <div class="space-y-1">
         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Senha</label>
-        <input type="password" class="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-4 py-3 text-slate-200 focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none transition-all" placeholder="••••••••">
+        <input formControlName="password" type="password" class="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-4 py-3 text-slate-200 focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 outline-none transition-all" placeholder="••••••••">
       </div>
 
-      <button (click)="goToHome()" class="w-full bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-bold py-4 rounded-2xl shadow-lg shadow-cyan-950/20 transition-all active:scale-[0.98] mt-2">
+      <div *ngIf="errorMessage" class="text-red-400 text-sm font-semibold">{{ errorMessage }}</div>
+
+      <button type="submit" class="w-full bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:brightness-110 text-white font-bold py-4 rounded-2xl shadow-lg shadow-cyan-950/20 transition-all active:scale-[0.98] mt-2">
         Entrar no Sistema
       </button>
 
