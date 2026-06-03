@@ -31,12 +31,11 @@ public class HackathonServiceTest {
     void setUp() {
         testHackathon = Hackathon.builder()
                 .id(1L)
-                .name("Tech Hackathon 2026")
+                .title("Tech Hackathon 2026")
                 .description("A hackathon for innovative tech solutions")
                 .startDate(LocalDateTime.now().plusDays(1))
                 .endDate(LocalDateTime.now().plusDays(3))
                 .location("São Paulo, Brazil")
-                .maxParticipants(100)
                 .build();
     }
 
@@ -48,7 +47,7 @@ public class HackathonServiceTest {
         Optional<Hackathon> result = hackathonService.findById(1L);
 
         assertTrue(result.isPresent());
-        assertEquals("Tech Hackathon 2026", result.get().getName());
+        assertEquals("Tech Hackathon 2026", result.get().getTitle());
         verify(hackathonRepository, times(1)).findById(1L);
     }
 
@@ -70,14 +69,13 @@ public class HackathonServiceTest {
         var savedHackathon = hackathonService.saveHackathon(testHackathon);
 
         assertNotNull(savedHackathon);
-        assertEquals("Tech Hackathon 2026", savedHackathon.getName());
-        assertEquals(100, savedHackathon.getMaxParticipants());
+        assertEquals("Tech Hackathon 2026", savedHackathon.getTitle());
         verify(hackathonRepository, times(1)).save(testHackathon);
     }
 
     @Test
     void testHackathonValidation() {
-        assertNotNull(testHackathon.getName());
+        assertNotNull(testHackathon.getTitle());
         assertNotNull(testHackathon.getStartDate());
         assertNotNull(testHackathon.getEndDate());
         assertTrue(testHackathon.getStartDate().isBefore(testHackathon.getEndDate()));

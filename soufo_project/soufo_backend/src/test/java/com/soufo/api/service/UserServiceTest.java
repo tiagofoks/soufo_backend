@@ -1,7 +1,6 @@
 package com.soufo.api.service;
 
 import com.soufo.api.model.User;
-import com.soufo.api.model.Role;
 import com.soufo.api.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,6 @@ public class UserServiceTest {
                 .password("encoded_password")
                 .firstName("Test")
                 .lastName("User")
-                .role(Role.USER)
                 .enabled(true)
                 .build();
     }

@@ -39,22 +39,26 @@ public class DatabaseInitializer implements CommandLineRunner {
             return;
         }
 
+        String normalized = triggersScript
+                .replaceAll("(?m)^DELIMITER .*?$", "")
+                .replaceAll("(?m)^--.*?$", "")
+                .trim();
+
+        String[] statements = normalized.split("(?m)\\s*//\\s*(\\r?\\n|$)");
+
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
-            
-            // Split by DELIMITER to properly execute multi-statement triggers
-            String[] statements = triggersScript.split("DELIMITER|;");
-            
+
             for (String sql : statements) {
                 String trimmed = sql.trim();
-                if (!trimmed.isEmpty() && !trimmed.equals("/")) {
-                    try {
-                        stmt.execute(trimmed);
-                        logger.debug("Executed trigger: {}", trimmed.substring(0, Math.min(50, trimmed.length())));
-                    } catch (Exception e) {
-                        // Log but continue - triggers might already exist
-                        logger.debug("Trigger execution note: {}", e.getMessage());
-                    }
+                if (trimmed.isEmpty()) {
+                    continue;
+                }
+                try {
+                    stmt.execute(trimmed);
+                    logger.debug("Executed trigger: {}", trimmed.substring(0, Math.min(50, trimmed.length())));
+                } catch (Exception e) {
+                    logger.debug("Trigger execution note: {}", e.getMessage());
                 }
             }
         }
