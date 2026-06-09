@@ -33,6 +33,35 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  async joinHackathon(hackathonId: number) {
+    const email = this.userService.getEmail();
+    if (!email) {
+      alert('Faça login para se inscrever no hackathon.');
+      return;
+    }
+
+    const teamName = `Equipe de ${this.userService.getUserName()}`;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/hackathons/${hackathonId}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, teamName })
+      });
+
+      if (!response.ok) {
+        const txt = await response.text();
+        alert('Erro ao inscrever-se: ' + txt);
+        return;
+      }
+
+      alert('Inscrição realizada com sucesso!');
+    } catch (error) {
+      console.error('Erro na inscrição:', error);
+      alert('Erro de rede ao inscrever-se.');
+    }
+  }
+
   ngOnInit() {
     this.userName = this.userService.getUserName();
     this.fetchHackathons();

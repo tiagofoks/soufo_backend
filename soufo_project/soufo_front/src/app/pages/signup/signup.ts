@@ -72,7 +72,8 @@ export class SignupComponent {
     }
 
     this.userService.setUserName(`${response.firstName} ${response.lastName}`);
+    this.userService.setUserEmail(response.email);
     this.userService.setAuthToken(response.token);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 }

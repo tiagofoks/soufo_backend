@@ -25,15 +25,32 @@ export interface AuthResponse {
 })
 export class UserService {
   private userName = '';
+  private userEmail = '';
   private authToken = '';
   private readonly apiUrl = '/api';
 
+  constructor() {
+    this.authToken = localStorage.getItem('soufo-auth-token') || '';
+    this.userEmail = localStorage.getItem('soufo-user-email') || '';
+    this.userName = localStorage.getItem('soufo-user-name') || '';
+  }
+
   setUserName(name: string) {
     this.userName = name;
+    localStorage.setItem('soufo-user-name', name);
   }
 
   getUserName(): string {
     return this.userName || 'Usuário';
+  }
+
+  setUserEmail(email: string) {
+    this.userEmail = email;
+    localStorage.setItem('soufo-user-email', email);
+  }
+
+  getEmail(): string {
+    return this.userEmail;
   }
 
   setAuthToken(token: string) {

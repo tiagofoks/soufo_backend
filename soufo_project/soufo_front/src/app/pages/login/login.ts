@@ -41,6 +41,7 @@ export class LoginComponent {
     }
 
     this.userService.setUserName(`${result.firstName} ${result.lastName}`);
+    this.userService.setUserEmail(result.email);
     this.userService.setAuthToken(result.token);
     this.router.navigate(['/home']);
   }
