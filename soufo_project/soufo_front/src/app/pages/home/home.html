@@ -67,6 +67,9 @@
               <span>Início: {{ hackathon.startDate | date:'medium' }}</span>
               <span>Fim: {{ hackathon.endDate | date:'medium' }}</span>
             </div>
+            <div class="mt-5 flex gap-3">
+              <button (click)="joinHackathon(hackathon.id)" class="px-4 py-2 rounded-xl bg-cyan-600 text-white text-sm font-bold hover:brightness-105">Inscrever-se</button>
+            </div>
           </div>
         </div>
       </section>

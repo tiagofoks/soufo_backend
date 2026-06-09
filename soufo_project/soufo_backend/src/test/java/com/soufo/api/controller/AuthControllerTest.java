@@ -33,7 +33,7 @@ public class AuthControllerTest {
         registerRequest.setFirstName("Test");
         registerRequest.setLastName("User");
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/auth/register").contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated());
@@ -42,7 +42,7 @@ public class AuthControllerTest {
         authRequest.setEmail(email);
         authRequest.setPassword(password);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/auth/login").contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(authRequest)))
                 .andExpect(status().isOk());
