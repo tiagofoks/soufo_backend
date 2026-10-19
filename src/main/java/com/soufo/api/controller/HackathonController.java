@@ -11,6 +11,12 @@ import com.soufo.api.repository.TeamMemberRepository;
 import com.soufo.api.repository.TeamRepository;
 import com.soufo.api.repository.UserRepository;
 import com.soufo.api.service.HackathonService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/hackathons")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Hackathons", description = "Consulta, criação e inscrição em hackathons")
 public class HackathonController {
     private final HackathonService hackathonService;
     private final UserRepository userRepository;
@@ -40,11 +47,29 @@ public class HackathonController {
         this.teamMemberRepository = teamMemberRepository;
     }
 
+    @Operation(
+            summary = "Listar hackathons",
+            description = "Retorna todos os hackathons cadastrados no sistema."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de hackathons retornada com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Hackathon.class)))
+    })
     @GetMapping
     public ResponseEntity<List<Hackathon>> getAllHackathons() {
         return ResponseEntity.ok(hackathonService.findAll());
     }
 
+    @Operation(
+            summary = "Criar hackathon",
+            description = "Cria um novo evento de hackathon com data de início, fim e dados do organizador."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Hackathon criado com sucesso",
+                    content = @Content(schema = @Schema(implementation = Hackathon.class))),
+            @ApiResponse(responseCode = "400", description = "Dados obrigatórios ausentes ou inválidos")
+    })
     @PostMapping
     public ResponseEntity<Hackathon> createHackathon(@RequestBody HackathonRequest request) {
         if (request == null || request.getTitle() == null || request.getStartDateTime() == null || request.getEndDateTime() == null) {
@@ -64,6 +89,17 @@ public class HackathonController {
         return ResponseEntity.status(201).body(savedHackathon);
     }
 
+    @Operation(
+            summary = "Inscrever usuário no hackathon",
+            description = "Registra um participante em um hackathon, criando a equipe automaticamente quando necessário."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Inscrição realizada com sucesso",
+                    content = @Content(schema = @Schema(implementation = RegistrationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou equipe incompatível"),
+            @ApiResponse(responseCode = "404", description = "Usuário ou equipe não encontrada"),
+            @ApiResponse(responseCode = "409", description = "Usuário já está registrado nesta equipe")
+    })
     @PostMapping("/{id}/register")
     public ResponseEntity<?> registerForHackathon(@PathVariable("id") Long hackathonId, @RequestBody RegistrationRequest request) {
         if (request == null || request.getEmail() == null) {

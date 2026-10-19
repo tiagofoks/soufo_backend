@@ -5,6 +5,12 @@ import com.soufo.api.dto.AuthResponse;
 import com.soufo.api.dto.RegisterRequest;
 import com.soufo.api.model.User;
 import com.soufo.api.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,6 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Autenticação", description = "Cadastro, login e autenticação do usuário")
 public class AuthController {
 
     private final UserService userService;
@@ -26,6 +33,16 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @Operation(
+            summary = "Registrar novo usuário",
+            description = "Cria um novo usuário no sistema e retorna um token de acesso."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Dados obrigatórios ausentes ou inválidos"),
+            @ApiResponse(responseCode = "409", description = "Usuário já cadastrado")
+    })
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         if (request == null || request.getEmail() == null || request.getPassword() == null
@@ -54,6 +71,15 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(
+            summary = "Autenticar usuário",
+            description = "Valida e-mail e senha e retorna os dados do usuário autenticado com token."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return userService.authenticate(request.getEmail(), request.getPassword())

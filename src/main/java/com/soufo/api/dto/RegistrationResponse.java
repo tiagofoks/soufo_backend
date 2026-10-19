@@ -1,12 +1,20 @@
 package com.soufo.api.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 
+@Schema(name = "RegistrationResponse", description = "Resposta após inscrição com sucesso no hackathon")
 public class RegistrationResponse {
+    @Schema(description = "Identificador da equipe", example = "12")
     private Long teamId;
+    @Schema(description = "Nome da equipe", example = "Equipe Alpha")
     private String teamName;
+    @Schema(description = "Identificador do hackathon", example = "3")
     private Long hackathonId;
+    @Schema(description = "E-mail do usuário inscrito", example = "participante@email.com")
     private String userEmail;
+    @Schema(description = "Data e hora da inscrição", example = "2026-10-19T14:30:00")
     private LocalDateTime joinedAt;
 
     public RegistrationResponse() {

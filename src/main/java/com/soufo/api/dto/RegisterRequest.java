@@ -1,9 +1,16 @@
 package com.soufo.api.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(name = "RegisterRequest", description = "Dados para criação de um novo usuário")
 public class RegisterRequest {
+    @Schema(description = "E-mail do usuário", example = "novo@email.com")
     private String email;
+    @Schema(description = "Senha para acesso do usuário", example = "senhaSegura123")
     private String password;
+    @Schema(description = "Primeiro nome do usuário", example = "João")
     private String firstName;
+    @Schema(description = "Sobrenome do usuário", example = "Souza")
     private String lastName;
 
     public String getEmail() {
